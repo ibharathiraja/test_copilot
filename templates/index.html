@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .task {
+            padding: 10px;
+            margin: 10px 0;
+            background: #f0f0f0;
+            border-radius: 5px;
+        }
+        .completed {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+        /* Bug 1: Inline styles mixed with CSS */
+    </style>
+</head>
+<body>
+    <h1>Task Manager</h1>
+    
+    <!-- Bug 2: No CSRF protection -->
+    <form method="POST" action="/add">
+        <!-- Bug 3: No required attribute or client-side validation -->
+        <input type="text" name="task" placeholder="Enter new task">
+        <button type="submit">Add Task</button>
+    </form>
+
+    <div id="tasks">
+        <!-- Bug 4: No check if tasks is empty before loop -->
+        {% for task in tasks %}
+        <div class="task {% if task.completed %}completed{% endif %}">
+            <!-- Bug 5: Potential XSS vulnerability - not escaping user input -->
+            <span>{{ task.name|safe }}</span>
+            
+            <!-- Bug 6: Multiple forms instead of buttons, inefficient -->
+            {% if not task.completed %}
+            <a href="/complete/{{ task.id }}" style="margin-left: 10px;">Complete</a>
+            {% endif %}
+            
+            <!-- Bug 7: No confirmation before delete -->
+            <a href="/delete/{{ task.id }}" style="margin-left: 10px; color: red;">Delete</a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Bug 8: Script tag at bottom, should use defer or proper placement -->
+    <script>
+        // Bug 9: Console.log left in production code
+        console.log('Tasks loaded');
+        
+        // Bug 10: No error handling for fetch operations
+        function refreshTasks() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>
